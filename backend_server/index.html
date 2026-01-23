@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <form action="/api/products/add" method="POST" onsubmit="submitForm(event)">
+      <input type="text" name="name" placeholder="Name" />
+      <input type="number" name="price" placeholder="price" />
+      <select name="category" id="category">
+        <option value="">--Select Category--</option>
+        <option value="tech">Tech</option>
+        <option value="science">Science</option>
+        <option value="arts">Arts</option>
+        <option value="sports">Sports</option>
+      </select>
+      <input type="text" name="desc" placeholder="desc" />
+      <input type="submit" />
+    </form>
+  </body>
+  <script>
+   async function submitForm(e) {
+  e.preventDefault();
+
+  const data = Object.fromEntries(new FormData(e.target));
+
+  try {
+    const res = await fetch("http://localhost:5000/api/products/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) throw new Error();
+
+    alert("Data stored successfully ✅");
+    e.target.reset();
+  } catch {
+    alert("Error storing data ❌");
+  }
+}
+
+  </script>
+</html>
