@@ -14,7 +14,7 @@ const dataModal=require("../modal/productModal")
         res.status(200).send("data is added")
     }
     catch (err){
-        res.status(404).send(`error name:${err.name}, error message:${err.message}`)
+        res.status(500).send(`error name:${err.name}, error message:${err.message}`)
 
     }
  }
@@ -45,7 +45,7 @@ const updateData=async()=>{
 
 // deleteData to database (delete)
 
-const deleteData=async()=>{
+const deleteData=async(req,res)=>{
     try{
         const deleteProduct=await dataModal.findByIdAndDelete(req.params.id)
         res.status(200).send({message: "Deleted successfully"})
