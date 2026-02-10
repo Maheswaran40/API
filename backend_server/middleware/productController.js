@@ -8,7 +8,8 @@ const dataModal=require("../modal/productModal")
             name:req.body.name,
             price: req.body.price,
             category: req.body.category,
-            desc: req.body.desc
+            desc: req.body.desc,
+            image:req.body.image
         })
         await product_Data.save()
         res.status(200).send("data is added")
@@ -33,7 +34,7 @@ const dataModal=require("../modal/productModal")
 // updateData to data base (put)
 // Model.findByIdAndUpdate(id, updateData, options)
 // {new:true} ==> for updated data
-const updateData=async()=>{
+const updateData=async(req,res)=>{
     try{
         const updateProduct=await dataModal.findByIdAndUpdate(req.params.id,req.body,{new:true})
         res.status(200).send("Data Update")

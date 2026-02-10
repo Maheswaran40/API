@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import axios from "axios";
+import uploadimg from "./assets/upload_img.jpg";
 
 function App() {
   // ----- POST form state -----
@@ -8,6 +9,40 @@ function App() {
   const [Price, setPrice] = useState("");
   const [Category, setCategory] = useState("");
   const [Desc, setDesc] = useState("");
+  const [image, setImage] = useState(""); // base64 url
+  const [preview, setPreview] = useState("");
+  const [filename, setFilename] = useState(""); // extracted from file
+
+
+  // preview function start
+
+  const imgpreview = (e) => {
+    const file = e.target.files[0]; //targeting img through files
+    if (file) {
+      setFilename(file.name); // use original filename
+      const reader = new FileReader(); //filereader for read the img file
+      reader.onloadend = () => {
+        setImage(reader.result);
+        setPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+      console.log(file);
+      
+    }
+  };
+// preview for update image
+  const updateImgpreview = (e) => {
+    const file = e.target.files[0]; //targeting img through files
+    if (file) {
+      setupdateFilename(file.name);
+      const reader = new FileReader(); //filereader for read the img file
+      reader.onloadend = () => {
+        setupdateImage(reader.result);
+        setupdatePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // ----- GET data state -----
   const [input, setInput] = useState([]);
@@ -18,7 +53,8 @@ function App() {
   const [editPrice, setEditPrice] = useState("");
   const [editCategory, setEditCategory] = useState("");
   const [editDesc, setEditDesc] = useState("");
-
+  var [updateImage, setupdateImage] = useState("");
+  var [updatePreview, setupdatePreview] = useState("");
   // ---------------- POST function ----------------
   async function submitForm(e) {
     e.preventDefault();
@@ -33,6 +69,7 @@ function App() {
         price: Number(Price),
         category: Category,
         desc: Desc.trim(),
+        image:image
       };
       await axios.post("http://localhost:5000/api/products/add", formData);
       alert("Data stored successfully");
@@ -51,7 +88,7 @@ function App() {
   async function viewFun() {
     try {
       const dataBaseData = await axios.get(
-        "http://localhost:5000/api/products/list"
+        "http://localhost:5000/api/products/list",
       );
       setInput(dataBaseData.data);
     } catch (err) {
@@ -65,7 +102,8 @@ function App() {
 
   // ---------------- DELETE function ----------------
   async function deleteFun(proId) {
-    if (!window.confirm("Are you sure you want to delete this product?")) return;
+    if (!window.confirm("Are you sure you want to delete this product?"))
+      return;
     try {
       await axios.delete(`http://localhost:5000/api/products/delete/${proId}`);
       alert("Data deleted");
@@ -91,7 +129,7 @@ function App() {
           price: Number(editPrice),
           category: editCategory,
           desc: editDesc.trim(),
-        }
+        },
       );
       alert(response.data.message);
       setEditingId(null); // exit edit mode
@@ -106,9 +144,19 @@ function App() {
     <>
       {/* ----- ADD PRODUCT FORM ----- */}
       <form onSubmit={submitForm} style={{ marginBottom: "20px" }}>
+        <input type="file" hidden id="image" onChange={imgpreview} />
+          <br />
+          <label htmlFor="image">
+            <img
+              src={preview ? preview : uploadimg}
+              alt="not"
+              height="120"
+              width="120"
+            />
+          </label>
         <input
           type="text"
-          placeholder="Name"
+          placeholder="Names"
           value={Name}
           onChange={(e) => setName(e.target.value)}
         />
@@ -118,10 +166,7 @@ function App() {
           value={Price}
           onChange={(e) => setPrice(e.target.value)}
         />
-        <select
-          value={Category}
-          onChange={(e) => setCategory(e.target.value)}
-        >
+        <select value={Category} onChange={(e) => setCategory(e.target.value)}>
           <option value="">--Select Category--</option>
           <option value="tech">Tech</option>
           <option value="science">Science</option>
@@ -140,10 +185,33 @@ function App() {
       {/* ----- DISPLAY PRODUCTS ----- */}
       <div className="row">
         {input.map((value) => (
-          <div className="col-lg-4" key={value._id} style={{ border: "1px solid #ccc", padding: "10px", margin: "10px" }}>
+          <div
+            className="col-lg-4"
+            key={value._id}
+            style={{
+              border: "1px solid #ccc",
+              padding: "10px",
+              margin: "10px",
+            }}
+          >
             {editingId === value._id ? (
               // ----- EDIT FORM -----
               <div>
+                <input
+                    type="file"
+                    hidden
+                    id="updateimage"
+                    onChange={updateImgpreview}
+                  />
+                    <br />
+                  <label htmlFor="updateimage">
+                    <img
+                      src={updatePreview ? updatePreview : uploadimg}
+                      alt="upload img"
+                      height="120"
+                      width="120"
+                    />
+                  </label>
                 <input
                   type="text"
                   value={editName}
